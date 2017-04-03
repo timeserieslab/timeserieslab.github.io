@@ -5,17 +5,11 @@ Website for browsing Time Series Lab
 ## Build
 
 ```bash
-pulp build --to script/sandbox.js
+npm run build
 ```
 
-Install component
+This is an alias to:
 
 ```bash
-bower install purescript-math --save
-```
-
-Interactive console
-
-```bash
-pulp psci
+pulp build --to scripts/app.js
 ```
