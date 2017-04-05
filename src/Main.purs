@@ -13,5 +13,3 @@ main = HA.runHalogenAff do
   runUI page unit body
 
 
--- This is a single page application
--- page :: forall m. H.Component HH.HTML Query Unit Void m

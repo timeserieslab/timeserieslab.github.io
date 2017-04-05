@@ -1,34 +1,37 @@
-module Page (Query, page) where
+module Page where
 
 import Prelude
-
-import Data.Maybe (Maybe(..))
-
 import Halogen as H
 import Halogen.HTML as HH
+import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
+import Data.Maybe (Maybe(..))
 
 
-data Query a = ToggleState a
+data Query a = LoadSeries a
 
-type State = { on :: Boolean }
+type State = { series :: Maybe String }
 
 page :: forall m. H.Component HH.HTML Query Unit Void m
 page =
   H.component
-    { initialState: const initialState
-    , render
-    , eval
-    , receiver: const Nothing
+    { initialState: const initialState  -- query -> state const will creatre function which ignore query param
+    , render                            --  state -> HTML
+    , eval                              -- Query ->ComponentDSL state query output monad
+    , receiver: const Nothing           -- 
     }
   
 
 initialState :: State
-initialState = { on: false }
+initialState = { series: Nothing }
 
 render :: State -> H.ComponentHTML Query
 render state =
-  renderNavibar
+  HH.div_ 
+    [ renderNavibar 
+    , renderChart state
+    , renderUploadSection
+    ]
     
 
 renderNavibar :: forall p i. HH.HTML p i
@@ -48,9 +51,40 @@ renderNavibar =
     ]
 
 
+-- Render Chart based on provided Time Series.
+-- If there is no Series then render empty space
+renderChart :: forall p i. State -> HH.HTML p i
+renderChart state = 
+  HH.div 
+    [ HP.class_ (H.ClassName "panel panel-default") ]
+    [ HH.div 
+      [ HP.class_ (H.ClassName "panel-body") ]
+      [ HH.text (show state.series) ]  
+    ]
+
+
+-- Render upload button
+renderUploadSection :: forall p. HH.HTML p (Query Unit)
+renderUploadSection = 
+  HH.div 
+    [ HP.class_ (H.ClassName "panel panel-default") ]
+    [ HH.div 
+      [ HP.class_ (H.ClassName "panel-body") ]
+      [ HH.text "Select CSV file" 
+      , HH.div_
+        [ HH.input 
+          [ HP.type_ HP.InputFile
+          , HE.onChange (HE.input_ LoadSeries)
+          ] 
+        ]
+      ]
+    ]
+  
+
+
 -- Query evaluation      
 eval :: forall m. Query ~> H.ComponentDSL State Query Void m
 eval = case _ of
-  ToggleState next -> do
-    H.modify (\state -> { on: not state.on })
+  LoadSeries next -> do
+    H.modify (\state -> { series: Just "loaded" })
     pure next
