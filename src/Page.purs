@@ -9,6 +9,7 @@ import Data.Maybe (Maybe(..))
 
 
 data Query a = LoadSeries a
+             | SeriesLoaded a
 
 type State = { series :: Maybe String }
 
@@ -34,7 +35,7 @@ render state =
     ]
     
 
-renderNavibar :: forall p i. HH.HTML p i
+renderNavibar :: forall p. HH.HTML p (Query Unit)
 renderNavibar = 
   HH.nav
     [ HP.class_ (H.ClassName "navbar navbar-default") ]
@@ -53,7 +54,7 @@ renderNavibar =
 
 -- Render Chart based on provided Time Series.
 -- If there is no Series then render empty space
-renderChart :: forall p i. State -> HH.HTML p i
+renderChart :: forall p. State -> HH.HTML p (Query Unit)
 renderChart state = 
   HH.div 
     [ HP.class_ (H.ClassName "panel panel-default") ]
@@ -74,6 +75,7 @@ renderUploadSection =
       , HH.div_
         [ HH.input 
           [ HP.type_ HP.InputFile
+          , HP.id_ "fileInput"
           , HE.onChange (HE.input_ LoadSeries)
           ] 
         ]
@@ -83,8 +85,19 @@ renderUploadSection =
 
 
 -- Query evaluation      
+    -- var file = fileInput.files[0];
+    -- var reader = new FileReader();
+    -- reader.onload = function(e) {
+    --     csvUploaded(reader.result);
+    -- }
+    -- reader.readAsText(file);
 eval :: forall m. Query ~> H.ComponentDSL State Query Void m
 eval = case _ of
+  
   LoadSeries next -> do
+    --  d <- document =<< window
     H.modify (\state -> { series: Just "loaded" })
+    pure next
+
+  SeriesLoaded next -> do
     pure next
