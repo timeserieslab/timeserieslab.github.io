@@ -1,25 +1,31 @@
 module Page where
 
 import Prelude
-import Control.Monad.Aff (Aff)
+import Button as Button
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
-import Data.Maybe (Maybe(..))
 import Network.HTTP.Affjax as AX
+import Control.Monad.Aff (Aff)
+import Data.Maybe (Maybe(..))
 
 
-data Query a = LoadSeries a
+data Query a = HandleButton Button.Message a
+             | LoadSeries a
 
 type State = { loading :: Boolean
              , series :: Maybe String 
              }
 
+data Slot = ButtonSlot
+derive instance eqButtonSlot :: Eq Slot
+derive instance ordButtonSlot :: Ord Slot             
+
 
 page :: ∀ eff. H.Component HH.HTML Query Unit Void (Aff (ajax :: AX.AJAX | eff))
 page =
-  H.component
+  H.parentComponent
     { initialState: const initialState  -- query -> state const will creatre function which ignore query param
     , render                            -- state -> HTML
     , eval                              -- Query ->ComponentDSL state query output monad
@@ -31,7 +37,7 @@ initialState :: State
 initialState = { loading: false, series: Nothing }
 
 
-render :: State -> H.ComponentHTML Query
+render :: ∀ m. State -> H.ParentHTML Query Button.Query Slot m
 render state =
   HH.div_ 
     [ renderNavibar 
@@ -66,19 +72,23 @@ renderNavibar =
 
 -- Render Chart based on provided Time Series.
 -- If there is no Series then render empty space
-renderChart :: ∀ p. State -> HH.HTML p (Query Unit)
+renderChart :: ∀ m. State -> H.ParentHTML Query Button.Query Slot m
 renderChart state = 
   HH.div 
     [ HP.class_ (H.ClassName "panel panel-default") ]
     [ HH.div 
       [ HP.class_ (H.ClassName "panel-body") ]
-      [ HH.text (show state.series) ]  
+      [ HH.slot ButtonSlot Button.myButton unit (HE.input HandleButton)
+      , HH.text (show state.series) 
+      ]  
     ]
 
 
 -- Query evaluation      
-eval :: ∀ eff. Query ~> H.ComponentDSL State Query Void (Aff (ajax :: AX.AJAX | eff))
+eval :: ∀ eff. Query ~> H.ParentDSL State Query Button.Query Slot Void (Aff (ajax :: AX.AJAX | eff))
 eval = case _ of
+  HandleButton _ next -> do
+    pure next
   LoadSeries next -> do
     H.modify (_ { loading = true })
     response <- H.liftAff $ AX.get ("https://timeserieslab.github.io/testdata/small.csv")
