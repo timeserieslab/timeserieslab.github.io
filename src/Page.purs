@@ -16,6 +16,7 @@ type State = { loading :: Boolean
              , series :: Maybe String 
              }
 
+
 page :: ∀ eff. H.Component HH.HTML Query Unit Void (Aff (ajax :: AX.AJAX | eff))
 page =
   H.component
