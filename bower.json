@@ -9,7 +9,7 @@
   "dependencies": {
     "purescript-affjax": "^4.0.0",
     "purescript-halogen": "^2.0.0",
-    "purescript-timeseries": "^0.2.0"
+    "purescript-timeseries": "^0.3.0"
   },
   "devDependencies": {
     "purescript-console": "^3.0.0",
