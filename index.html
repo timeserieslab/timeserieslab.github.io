@@ -26,17 +26,17 @@
   </nav>
 
   <div class="container">
-    <canvas id="tsChart" width="100%" height="400px"></canvas>
+    <div id="tsChart" width="100%" height="400px"></div>
   </div>
 
  <script type="text/javascript">
-        d3.json('testdata/floyds-wins.json', function (data) {
+        d3.json('https://raw.githubusercontent.com/timeserieslab/timeserieslab.github.io/master/testdata/floyds-wins.json', function (data) {
             MG.data_graphic({
                 title: "Floyd Mayweather Wins Per Year",
                 description: "Floyd Mayweather Professional Wins",
                 data: data,
-                width: 650,
-                height: 150,
+                width: 1000,
+                height: 400,
                 target: '#tsChart',
                 x_accessor: 'year',
                 y_accessor: 'wins',
@@ -44,6 +44,23 @@
             });
         });
   </script> 
+
+  <h2>Basic Time Series Info</h2>
+
+  <ul>
+    <li>Time range: (from: to)</li>
+    <li>Time resolution</li>
+    <li>Number of missing values</li>
+    <li>Number of outliers</li>
+  </ul>
+
+  <h2>Example Time Series</h2>
+
+  <ul>
+    <li>60K dataset with anomalies <button class="btn">Load</button></li>
+    <li>Small dataset <button class="btn">Load</button></li>
+    <li>Turkey daily electricity demand <button class="btn">Load</button></li>
+  </ul>
   
   <hr/>
   <footer style="text-align: center;">
