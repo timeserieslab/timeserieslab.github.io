@@ -2,15 +2,11 @@ module Main where
 
 import Prelude
 import Control.Monad.Eff (Eff)
-import Halogen.Aff as HA
-import Halogen.VDom.Driver (runUI)
-import Network.HTTP.Affjax as AX
-import Page (page)
+import Control.Monad.Eff.Console (CONSOLE, log)
 
+main :: forall e. Eff (console :: CONSOLE | e) Unit
+main = do
+  log "Time Series Lab loaded."
 
-main :: Eff (HA.HalogenEffects (ajax :: AX.AJAX)) Unit
-main = HA.runHalogenAff do
-  body <- HA.awaitBody
-  runUI page unit body
 
 
