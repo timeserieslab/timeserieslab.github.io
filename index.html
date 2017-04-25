@@ -45,22 +45,25 @@
         });
   </script> 
 
-  <h2>Basic Time Series Info</h2>
+  <div id="seriesInfo" class="container">
+    <h2>Basic Time Series Info</h2>
+    <ul>
+      <li>Time range: (from: to)</li>
+      <li>Time resolution</li>
+      <li>Number of missing values</li>
+      <li>Number of outliers</li>
+    </ul>
+  </div>
 
-  <ul>
-    <li>Time range: (from: to)</li>
-    <li>Time resolution</li>
-    <li>Number of missing values</li>
-    <li>Number of outliers</li>
-  </ul>
+  <div id="seriesInfo" class="container">
+    <h2>Example Time Series</h2>
 
-  <h2>Example Time Series</h2>
-
-  <ul>
-    <li>60K dataset with anomalies <button class="btn btn-default">Load</button></li>
-    <li>Small dataset <button class="btn btn-default">Load</button></li>
-    <li>Turkey daily electricity demand <button class="btn btn-default">Load</button></li>
-  </ul>
+    <ul>
+      <li>60K dataset with anomalies <button id="dataButton1" class="btn btn-default">Load</button></li>
+      <li>Small dataset <button id="dataButton2" class="btn btn-default">Load</button></li>
+      <li>Turkey daily electricity demand <button id="dataButton3" class="btn btn-default">Load</button></li>
+    </ul>
+  </div>
   
   <hr/>
   <footer style="text-align: center;">
