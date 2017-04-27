@@ -2,20 +2,13 @@ module Main where
 
 import Prelude
 import Control.Monad.Eff (Eff)
-import Control.Monad.Eff.Console (CONSOLE, log)
-
-import DOM.HTML (window)
-import DOM.HTML.Window (document)
-
-
-main :: forall e. Eff (console :: CONSOLE, dom :: DOM | e) Unit
-main = do
-  connectButtons
+import Halogen.Aff as HA
+import Halogen.VDom.Driver (runUI)
+import Network.HTTP.Affjax as AX
+import Page (page)
 
 
--- | Connect buttons loading example datasets
-connectButtons :: forall e. Eff (console :: CONSOLE, dom :: DOM | e) Unit
-connectButtons = do
-  doc <- document <$> window
-  log doc
-  -- getElementById "" doc
+main :: Eff (HA.HalogenEffects (ajax :: AX.AJAX)) Unit
+main = HA.runHalogenAff do
+  body <- HA.awaitBody
+  runUI page unit body

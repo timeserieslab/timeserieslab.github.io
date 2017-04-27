@@ -17,59 +17,5 @@
   <script type="text/javascript" src="scripts/app.js"></script>
 </head>
 <body>
-  <nav class="navbar navbar-default">
-    <div class="container-fluid">
-      <div class="navbar-header">
-        <a class="navbar-brand" href="#">Time Series Lab</a>
-      </div>
-    </div>
-  </nav>
-
-  <div class="container">
-    <div id="tsChart" width="100%" height="400px"></div>
-  </div>
-
- <script type="text/javascript">
-        d3.json('https://raw.githubusercontent.com/timeserieslab/timeserieslab.github.io/master/testdata/floyds-wins.json', function (data) {
-            MG.data_graphic({
-                title: "Floyd Mayweather Wins Per Year",
-                description: "Floyd Mayweather Professional Wins",
-                data: data,
-                area: false,
-                width: 1000,
-                height: 400,
-                target: '#tsChart',
-                x_accessor: 'year',
-                y_accessor: 'wins',
-                markers: [{'year': 1998, 'label': '"WBC World Title'}]
-            });
-        });
-  </script> 
-
-  <div id="seriesInfo" class="container">
-    <h2>Basic Time Series Info</h2>
-    <ul>
-      <li>Time range: (from: to)</li>
-      <li>Time resolution</li>
-      <li>Number of missing values</li>
-      <li>Number of outliers</li>
-    </ul>
-  </div>
-
-  <div id="seriesInfo" class="container">
-    <h2>Example Time Series</h2>
-
-    <ul>
-      <li>Test <button id="btnTest" class="btn btn-default">Load</button></li>
-      <li>60K dataset with anomalies <button id="btnData1" class="btn btn-default">Load</button></li>
-      <li>Small dataset <button id="btnData2" class="btn btn-default">Load</button></li>
-      <li>Turkey daily electricity demand <button id="btnData3" class="btn btn-default">Load</button></li>
-    </ul>
-  </div>
-  
-  <hr/>
-  <footer style="text-align: center;">
-    <a href="https://github.com/timeserieslab/timeserieslab.github.io">Github</a>
-  </footer>
 </body>
 </html>
