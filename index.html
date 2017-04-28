@@ -26,25 +26,13 @@
   </nav>
 
   <div class="container">
-    <div id="tsChart" width="100%" height="400px"></div>
+     <div class="navbar-left navbar-text">Select CSV file</div>
+     <div><input type="file" id="fileInput" class="btn"></div>    
   </div>
 
- <script type="text/javascript">
-        d3.json('https://raw.githubusercontent.com/timeserieslab/timeserieslab.github.io/master/testdata/floyds-wins.json', function (data) {
-            MG.data_graphic({
-                title: "Floyd Mayweather Wins Per Year",
-                description: "Floyd Mayweather Professional Wins",
-                data: data,
-                area: false,
-                width: 1000,
-                height: 400,
-                target: '#tsChart',
-                x_accessor: 'year',
-                y_accessor: 'wins',
-                markers: [{'year': 1998, 'label': '"WBC World Title'}]
-            });
-        });
-  </script> 
+  <div class="container">
+    <div id="tsChart" width="100%" height="400px"></div>
+  </div>
 
   <div id="seriesInfo" class="container">
     <h2>Basic Time Series Info</h2>
@@ -59,10 +47,11 @@
   <div id="seriesInfo" class="container">
     <h2>Example Time Series</h2>
 
+
     <p>
-      <button id="btnData1" class="btn btn-default">Anomalies 60K</button>
-      <button id="btnData2" class="btn btn-default">Small dataset</button>
-      <button id="btnData3" class="btn btn-default">Turkey daily electricity demand</button>
+      <button onClick="btnData1Click();" class="btn btn-default">Anomalies 60K</button>
+      <button onClick="btnData1Click();" class="btn btn-default">Small dataset</button>
+      <button onClick="btnData1Click();" class="btn btn-default">Turkey daily electricity demand</button>
     </p>
   </div>
   
@@ -70,5 +59,77 @@
   <footer style="text-align: center;">
     <a href="https://github.com/timeserieslab/timeserieslab.github.io">Github</a>
   </footer>
+
+  <script type="text/javascript">
+    function btnData1Click() {
+        d3.json('https://raw.githubusercontent.com/timeserieslab/timeserieslab.github.io/master/testdata/floyds-wins.json', function (data) {
+            MG.data_graphic({
+                title: "Floyd Mayweather Wins Per Year",
+                description: "Floyd Mayweather Professional Wins",
+                data: data,
+                area: false,
+                width: 1000,
+                height: 400,
+                target: '#tsChart',
+                x_accessor: 'year',
+                y_accessor: 'wins',
+                markers: [{'year': 1998, 'label': '"WBC World Title'}]
+            });
+        });
+    }
+
+    function btnData2Click() {
+        d3.json('https://raw.githubusercontent.com/timeserieslab/timeserieslab.github.io/master/testdata/floyds-wins.json', function (data) {
+            MG.data_graphic({
+                title: "Floyd Mayweather Wins Per Year",
+                description: "Floyd Mayweather Professional Wins",
+                data: data,
+                area: false,
+                width: 1000,
+                height: 400,
+                target: '#tsChart',
+                x_accessor: 'year',
+                y_accessor: 'wins',
+                markers: [{'year': 1998, 'label': '"WBC World Title'}]
+            });
+        });
+    }
+
+    function btnData3Click() {
+        d3.json('https://raw.githubusercontent.com/timeserieslab/timeserieslab.github.io/master/testdata/floyds-wins.json', function (data) {
+            MG.data_graphic({
+                title: "Floyd Mayweather Wins Per Year",
+                description: "Floyd Mayweather Professional Wins",
+                data: data,
+                area: false,
+                width: 1000,
+                height: 400,
+                target: '#tsChart',
+                x_accessor: 'year',
+                y_accessor: 'wins',
+                markers: [{'year': 1998, 'label': '"WBC World Title'}]
+            });
+        });
+    }
+
+    window.onload = function() {
+      var fileInput = document.getElementById('fileInput');
+      fileInput.addEventListener('change', function(e) {
+          var file = fileInput.files[0];
+          var textType = /text.*/;
+          if (file.type.match(textType)) {
+              var reader = new FileReader();
+              reader.onload = function(e) {
+                console.log(reader.result);
+              }
+              reader.readAsText(file);
+          } else {
+              console.log("File not supported!");
+          }
+      });
+    }
+    
+  </script> 
+
 </body>
 </html>
