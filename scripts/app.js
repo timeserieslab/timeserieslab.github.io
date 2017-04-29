@@ -267,6 +267,12 @@ var PS = {};
     };
   };
 
+  exports.take = function (n) {
+    return function (l) {
+      return n < 1 ? [] : l.slice(0, n);
+    };
+  };
+
   //------------------------------------------------------------------------------
   // Zipping ---------------------------------------------------------------------
   //------------------------------------------------------------------------------
@@ -510,6 +516,7 @@ var PS = {};
   exports["zip"] = zip;
   exports["length"] = $foreign.length;
   exports["range"] = $foreign.range;
+  exports["take"] = $foreign.take;
 })(PS["Data.Array"] = PS["Data.Array"] || {});
 (function(exports) {
     "use strict";
@@ -708,14 +715,16 @@ var PS = {};
   var Data_TimeSeries = PS["Data.TimeSeries"];
   var Data_TimeSeries_IO = PS["Data.TimeSeries.IO"];
   var Prelude = PS["Prelude"];        
-  var toChartData = function (xs) {
-      var f = function (dp) {
-          return {
-              date: $foreign.timestampToDate(dp.index), 
-              value: dp.value
+  var toChartData = function (n) {
+      return function (xs) {
+          var f = function (dp) {
+              return {
+                  date: $foreign.timestampToDate(dp.index), 
+                  value: dp.value
+              };
           };
+          return Data_Array.take(n)(Data_Functor.map(Data_Functor.functorArray)(f)(Data_TimeSeries.toDataPoints(xs)));
       };
-      return Data_Functor.map(Data_Functor.functorArray)(f)(Data_TimeSeries.toDataPoints(xs));
   };
   var main = Control_Monad_Eff_Console.log("App started");
   var fromCsv = function (str) {
