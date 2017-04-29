@@ -3,24 +3,28 @@ module Main where
 import Prelude
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE, log)
-
+import Data.Array as A
+import Data.Maybe (fromMaybe)
 import DOM (DOM)
-import DOM.HTML (window)
-import DOM.HTML.Window (document)
-import DOM.HTML.Types (htmlDocumentToNonElementParentNode)
-import DOM.Node.NonElementParentNode (getElementById)
-import DOM.Node.Types (ElementId(..))
+
+import Data.TimeSeries as TS
+import Data.TimeSeries.IO as IO
+
+
+foreign import timestampToDate :: Number -> Number
 
 
 main :: forall e. Eff (console :: CONSOLE, dom :: DOM | e) Unit
 main = do
-  connectButtons
+  log "App started"
 
 
--- | Connect buttons loading example datasets
-connectButtons :: forall e. Eff (console :: CONSOLE, dom :: DOM | e) Unit
-connectButtons = do
-  doc <- document <$> window
-  -- btnData1 <- getElementById (ElementId "btnData1") (htmlDocumentToNonElementParentNode doc)
-  log $ "ok" --show btnData1
-  
+-- | Convert CSV to Time series
+fromCsv :: String -> TS.Series Number
+fromCsv str = fromMaybe TS.empty $ A.head (IO.fromCsv str)
+
+
+toChartData :: TS.Series Number -> Array ({date :: Number, value :: Number})
+toChartData xs = map f (TS.toDataPoints xs)
+  where
+    f dp = {date: timestampToDate dp.index, value: dp.value}

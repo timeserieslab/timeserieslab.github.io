@@ -35,23 +35,16 @@
   </div>
 
   <div id="seriesInfo" class="container">
-    <h2>Basic Time Series Info</h2>
-    <ul>
-      <li>Time range: (from: to)</li>
-      <li>Time resolution</li>
-      <li>Number of missing values</li>
-      <li>Number of outliers</li>
-    </ul>
-  </div>
-
-  <div id="seriesInfo" class="container">
     <h2>Example Time Series</h2>
 
-
     <p>
-      <button onClick="btnData1Click();" class="btn btn-default">Anomalies 60K</button>
-      <button onClick="btnData1Click();" class="btn btn-default">Small dataset</button>
-      <button onClick="btnData1Click();" class="btn btn-default">Turkey daily electricity demand</button>
+      <button onClick="loadJsonExample('floyds-wins.json');" class="btn btn-default">Floyds wins</button>
+      <button onClick="loadCsvExample('small.csv');" class="btn btn-default">Small dataset</button>
+      <!--
+      <button onClick="loadCsvExample('test-24K.csv');" class="btn btn-default">Medium 24K points dataset</button>
+      <button onClick="loadCsvExample('turkey-elec.csv');" class="btn btn-default">Turkey daily electricity demand</button>
+      <button onClick="loadCsvExample('anomalies.csv');" class="btn btn-default">Anomalies 60K</button>
+      -->
     </p>
   </div>
   
@@ -61,57 +54,32 @@
   </footer>
 
   <script type="text/javascript">
-    function btnData1Click() {
-        d3.json('https://raw.githubusercontent.com/timeserieslab/timeserieslab.github.io/master/testdata/floyds-wins.json', function (data) {
-            MG.data_graphic({
-                title: "Floyd Mayweather Wins Per Year",
-                description: "Floyd Mayweather Professional Wins",
-                data: data,
-                area: false,
-                width: 1000,
-                height: 400,
-                target: '#tsChart',
-                x_accessor: 'year',
-                y_accessor: 'wins',
-                markers: [{'year': 1998, 'label': '"WBC World Title'}]
-            });
+    var Main = PS['Main'];
+
+    function loadJsonExample(fname) {
+        d3.json('https://raw.githubusercontent.com/timeserieslab/timeserieslab.github.io/master/testdata/' + fname, function (data) {
+          MG.data_graphic({
+             title: "Floyd Mayweather Wins Per Year",
+              description: "Floyd Mayweather Professional Wins",
+              data: data,
+              area: false,
+              width: 1000,
+              height: 400,
+              target: '#tsChart',
+              x_accessor: 'year',
+              y_accessor: 'wins'
+          });      
         });
     }
 
-    function btnData2Click() {
-        d3.json('https://raw.githubusercontent.com/timeserieslab/timeserieslab.github.io/master/testdata/floyds-wins.json', function (data) {
-            MG.data_graphic({
-                title: "Floyd Mayweather Wins Per Year",
-                description: "Floyd Mayweather Professional Wins",
-                data: data,
-                area: false,
-                width: 1000,
-                height: 400,
-                target: '#tsChart',
-                x_accessor: 'year',
-                y_accessor: 'wins',
-                markers: [{'year': 1998, 'label': '"WBC World Title'}]
-            });
-        });
+    function loadCsvExample(fname) {
+      jQuery.get('https://raw.githubusercontent.com/timeserieslab/timeserieslab.github.io/master/testdata/'+fname, function (data) {
+        var ts = Main.fromCsv(data);
+        show_time_series(ts);
+      });
     }
 
-    function btnData3Click() {
-        d3.json('https://raw.githubusercontent.com/timeserieslab/timeserieslab.github.io/master/testdata/floyds-wins.json', function (data) {
-            MG.data_graphic({
-                title: "Floyd Mayweather Wins Per Year",
-                description: "Floyd Mayweather Professional Wins",
-                data: data,
-                area: false,
-                width: 1000,
-                height: 400,
-                target: '#tsChart',
-                x_accessor: 'year',
-                y_accessor: 'wins',
-                markers: [{'year': 1998, 'label': '"WBC World Title'}]
-            });
-        });
-    }
-
+    // Connect load from disk
     window.onload = function() {
       var fileInput = document.getElementById('fileInput');
       fileInput.addEventListener('change', function(e) {
@@ -120,13 +88,30 @@
           if (file.type.match(textType)) {
               var reader = new FileReader();
               reader.onload = function(e) {
-                console.log(reader.result);
+                var ts = Main.fromCsv(reader.result);
+                show_time_series(ts);
               }
               reader.readAsText(file);
           } else {
               console.log("File not supported!");
           }
       });
+    }
+
+    // Show chart with time series
+    function show_time_series(ts) {
+      var data = Main.toChartData(ts);
+      // console.log(data);
+      MG.data_graphic({
+          title: "",
+          data: data,
+          area: false,
+          width: 1000,
+          height: 400,
+          target: '#tsChart',
+          x_accessor: 'date',
+          y_accessor: 'value'
+      });      
     }
     
   </script> 
