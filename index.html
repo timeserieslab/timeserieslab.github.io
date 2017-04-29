@@ -88,7 +88,6 @@
           if (file.type.match(textType)) {
               var reader = new FileReader();
               reader.onload = function(e) {
-                console.log(reader.result);
                 var ts = Main.fromCsv(reader.result);
                 show_time_series(ts);
               }
@@ -101,7 +100,7 @@
 
     // Show chart with time series
     function show_time_series(ts) {
-      var data = Main.toChartData(500)(ts);
+      var data = Main.toChartData(1000)(ts);
       // console.log(data);
       MG.data_graphic({
           title: "",
