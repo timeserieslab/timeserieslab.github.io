@@ -39,12 +39,12 @@
 
     <p>
       <button onClick="loadJsonExample('floyds-wins.json');" class="btn btn-default">Floyds wins</button>
-      <button onClick="loadCsvExample('small.csv');" class="btn btn-default">Small dataset</button>
-      <button onClick="loadCsvExample('test-24k.csv');" class="btn btn-default">Medium 24K points dataset</button>
       <!--
       <button onClick="loadCsvExample('turkey-elec.csv');" class="btn btn-default">Turkey daily electricity demand</button>
-      <button onClick="loadCsvExample('anomalies.csv');" class="btn btn-default">Anomalies 60K</button>
       -->
+      <button onClick="loadCsvExample('small.csv');" class="btn btn-default">Small dataset</button>
+      <button onClick="loadCsvExample('test-24k.csv');" class="btn btn-default">Medium 24K points dataset</button>
+      <button onClick="loadCsvExample('anomalies.csv');" class="btn btn-default">Anomalies 60K</button>
     </p>
   </div>
   
@@ -57,7 +57,7 @@
     var Main = PS['Main'];
 
     function loadJsonExample(fname) {
-        d3.json('https://raw.githubusercontent.com/timeserieslab/timeserieslab.github.io/master/testdata/' + fname, function (data) {
+        d3.json('https://timeserieslab.github.io/testdata/' + fname, function (data) {
           MG.data_graphic({
              title: "Floyd Mayweather Wins Per Year",
               description: "Floyd Mayweather Professional Wins",
@@ -73,8 +73,12 @@
     }
 
     function loadCsvExample(fname) {
-      jQuery.get('https://raw.githubusercontent.com/timeserieslab/timeserieslab.github.io/master/testdata/'+fname, function (data) {
+      var t1 = Date.now();
+      jQuery.get('https://timeserieslab.github.io/testdata/'+fname, function (data) {
+        var t2 = Date.now();
+        console.log("Loaded " + fname + " in " +  + (t2-t1) + "ms.");
         var ts = Main.fromCsv(data);
+        console.log("Converted to Time Series in " + (Date.now()-t2) + "ms.");
         show_time_series(ts);
       });
     }
@@ -100,8 +104,10 @@
 
     // Show chart with time series
     function show_time_series(ts) {
+      var t1 = Date.now();
       var data = Main.toChartData(1000)(ts);
-      // console.log(data);
+      var t2 = Date.now();
+      console.log("Datapoints converted in " + (t2-t1) + "ms.");
       MG.data_graphic({
           title: "",
           data: data,
@@ -112,6 +118,7 @@
           x_accessor: 'date',
           y_accessor: 'value'
       });      
+      console.log("Plotted in " + (Date.now()-t2) + "ms.");
     }
     
   </script> 

@@ -26,6 +26,6 @@ fromCsv str = fromMaybe TS.empty $ A.head (IO.fromCsv str)
 
 -- | Take n samples from given series
 toChartData :: Int -> TS.Series Number -> Array ({date :: Number, value :: Number})
-toChartData n xs = A.take n $ map f (TS.toDataPoints xs)
+toChartData n xs = map f $ A.take n (TS.toDataPoints xs)
   where
     f dp = {date: timestampToDate dp.index, value: dp.value}

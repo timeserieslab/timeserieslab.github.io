@@ -723,7 +723,7 @@ var PS = {};
                   value: dp.value
               };
           };
-          return Data_Array.take(n)(Data_Functor.map(Data_Functor.functorArray)(f)(Data_TimeSeries.toDataPoints(xs)));
+          return Data_Functor.map(Data_Functor.functorArray)(f)(Data_Array.take(n)(Data_TimeSeries.toDataPoints(xs)));
       };
   };
   var main = Control_Monad_Eff_Console.log("App started");
