@@ -38,10 +38,10 @@
     <h2>Example Time Series</h2>
 
     <p>
-      <button onClick="loadCsvExample('small.csv');" class="btn btn-default">Small dataset</button>
-      <button onClick="loadCsvExample('turkey_elec.csv');" class="btn btn-default">Electricity demand</button>
-      <button onClick="loadCsvExample('test-24k.csv');" class="btn btn-default">Rainfall</button>
-      <button onClick="loadCsvExample('anomalies.csv');" class="btn btn-default">Anomalies 60K</button>
+      <button onClick="loadExample('small.csv');" class="btn btn-default">Small dataset</button>
+      <button onClick="loadExample('turkey_elec.csv');" class="btn btn-default">Electricity demand</button>
+      <button onClick="loadExample('test-24k.csv');" class="btn btn-default">Rainfall</button>
+      <button onClick="loadExample('anomalies.csv');" class="btn btn-default">Anomalies 60K</button>
     </p>
   </div>
   
@@ -54,10 +54,9 @@
     var Main = PS['Main'];
     var state = Main.initState;
 
-    function loadCsvExample(fname) {
+    function loadExample(fname) {
       jQuery.get('https://timeserieslab.github.io/testdata/'+fname, function (data) {
-        state = Main.updateState(state)(data);
-        Main.render(state);
+        seriesLoaded(data);
       });
     }
 
@@ -70,14 +69,18 @@
           if (file.type.match(textType)) {
               var reader = new FileReader();
               reader.onload = function(e) {
-                var ts = Main.fromCsv(reader.result);
-                show_time_series(ts);
+                seriesLoaded(reader.result);
               }
               reader.readAsText(file);
           } else {
               console.log("File not supported!");
           }
       });
+    }
+
+    function seriesLoaded(csv) {
+        state = Main.updateState(state)(csv);
+        Main.render(state);      
     }
 
   </script> 
