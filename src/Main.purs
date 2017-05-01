@@ -53,4 +53,4 @@ render {series: Just xs} = do
 toChartData :: Int -> TS.Series Number -> Array ({date :: JSDate, value :: Number})
 toChartData n xs = map f $ A.take n (TS.toDataPoints xs)
   where
-    f dp = {date: mkDate dp.index, value: dp.value}
+    f dp = {date: mkDate (TS.dpIndex dp), value: TS.dpValue dp}
