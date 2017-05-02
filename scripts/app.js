@@ -1014,7 +1014,9 @@ var PS = {};
           height: 400,
           target: '#tsChart',
           x_accessor: 'date',
-          y_accessor: 'value'
+          y_accessor: 'value',
+          utc_time: true,
+          transition_on_update: false
       });      
     }
   };
@@ -1046,6 +1048,14 @@ var PS = {};
   var Data_TimeSeries = PS["Data.TimeSeries"];
   var Helpers = PS["Helpers"];
   var Prelude = PS["Prelude"];        
+  var showRange = function (x1) {
+      return function (x2) {
+          return function __do() {
+              $foreign.setNodeText("showStart")(Helpers.toISO(Helpers.mkDate(x1)))();
+              return $foreign.setNodeText("showEnd")(Helpers.toISO(Helpers.mkDate(x2)))();
+          };
+      };
+  };
   var formatTimeDelta$prime = function (dt) {
       if ((dt / 86400000 | 0) > 2) {
           return Data_Show.show(Data_Show.showInt)(dt / 86400000 | 0) + " days.";
@@ -1062,7 +1072,7 @@ var PS = {};
       if (Data_Boolean.otherwise) {
           return Data_Show.show(Data_Show.showInt)(dt) + " milliseconds.";
       };
-      throw new Error("Failed pattern match at Views line 41, column 1 - line 46, column 30: " + [ dt.constructor.name ]);
+      throw new Error("Failed pattern match at Views line 42, column 1 - line 50, column 1: " + [ dt.constructor.name ]);
   };
   var formatTimeDelta = function (dt) {
       return formatTimeDelta$prime(Data_Int.round(dt));
@@ -1079,6 +1089,7 @@ var PS = {};
       };
   };
   exports["showMetadata"] = showMetadata;
+  exports["showRange"] = showRange;
   exports["plotSeries"] = $foreign.plotSeries;
 })(PS["Views"] = PS["Views"] || {});
 (function(exports) {
@@ -1108,8 +1119,14 @@ var PS = {};
   })();
   var updateState = function (st) {
       return function (v) {
+          var xs = Data_Array.head(Data_TimeSeries_IO.fromCsv(v.value0));
+          var indexVal = function (f) {
+              return Data_Maybe.fromMaybe(0.0)(Data_Functor.map(Data_Maybe.functorMaybe)(Data_TimeSeries.dpIndex)(Control_Bind.bind(Data_Maybe.bindMaybe)(xs)(f)));
+          };
           return {
-              series: Data_Array.head(Data_TimeSeries_IO.fromCsv(v.value0))
+              series: xs, 
+              startIndex: indexVal(Data_TimeSeries.head), 
+              endIndex: indexVal(Data_TimeSeries.last)
           };
       };
   };
@@ -1131,14 +1148,17 @@ var PS = {};
       if (v.series instanceof Data_Maybe.Just) {
           return function __do() {
               Views.plotSeries(toChartData(500)(v.series.value0))();
+              Views.showRange(v.startIndex)(v.endIndex)();
               return Views.showMetadata(v.series.value0)();
           };
       };
-      throw new Error("Failed pattern match at Main line 46, column 1 - line 47, column 1: " + [ v.constructor.name ]);
+      throw new Error("Failed pattern match at Main line 51, column 1 - line 52, column 1: " + [ v.constructor.name ]);
   };
   var main = Control_Monad_Eff_Console.log("App started");
   var initState = {
-      series: Data_Maybe.Nothing.value
+      series: Data_Maybe.Nothing.value, 
+      startIndex: 0.0, 
+      endIndex: 0.0
   };
   exports["SeriesLoaded"] = SeriesLoaded;
   exports["initState"] = initState;

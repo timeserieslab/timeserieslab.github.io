@@ -1,5 +1,6 @@
 module Views ( showMetadata
              , plotSeries
+             , showRange
              ) where
 
 import Prelude
@@ -44,3 +45,9 @@ formatTimeDelta' dt
     | dt / 60000 > 2 = show (dt / 60000) <> " minutes."
     | dt / 1000 > 2 = show (dt / 1000) <> " seconds."
     | otherwise = show dt <> " milliseconds."        
+
+
+showRange :: ∀ e. Number -> Number -> Eff (dom :: DOM | e) Unit
+showRange x1 x2 = do
+    setNodeText "showStart" $ toISO (mkDate x1)
+    setNodeText "showEnd" $ toISO (mkDate x2)

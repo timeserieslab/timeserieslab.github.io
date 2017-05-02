@@ -10,7 +10,9 @@ exports.plotSeries = function(data) {
         height: 400,
         target: '#tsChart',
         x_accessor: 'date',
-        y_accessor: 'value'
+        y_accessor: 'value',
+        utc_time: true,
+        transition_on_update: false
     });      
   }
 };
