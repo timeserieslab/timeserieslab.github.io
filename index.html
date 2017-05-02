@@ -36,6 +36,8 @@
       Show range from <strong id="showStart"></strong> to <strong id="showEnd"></strong>
       <button onClick="zoomIn()" class="btn btn-default">Zoom In</button>
       <button onClick="zoomOut()" class="btn btn-default">Zoom Out</button>
+      <button onClick="prevFrame()" class="btn btn-default">Previous</button>
+      <button onClick="nextFrame()" class="btn btn-default">Next</button>
     </div>
   </div>
 
@@ -105,6 +107,16 @@
 
     function zoomOut() {
         state = Main.updateState(state)(new Main.ZoomOut());
+        Main.render(state)();      
+    }
+
+    function prevFrame() {
+        state = Main.updateState(state)(new Main.PrevFrame());
+        Main.render(state)();      
+    }
+
+    function nextFrame() {
+        state = Main.updateState(state)(new Main.NextFrame());
         Main.render(state)();      
     }
 

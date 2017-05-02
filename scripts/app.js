@@ -1216,46 +1216,20 @@ var PS = {};
       ZoomOut.value = new ZoomOut();
       return ZoomOut;
   })();
-  var updateState = function (v) {
-      return function (v1) {
-          if (v1 instanceof SeriesLoaded) {
-              var xs = Data_Array.head(Data_TimeSeries_IO.fromCsv(v1.value0));
-              var indexVal = function (f) {
-                  return Data_Maybe.fromMaybe(0.0)(Data_Functor.map(Data_Maybe.functorMaybe)(Data_TimeSeries.dpIndex)(Control_Bind.bind(Data_Maybe.bindMaybe)(xs)(f)));
-              };
-              return {
-                  series: xs, 
-                  startIndex: indexVal(Data_TimeSeries.head), 
-                  endIndex: indexVal(Data_TimeSeries.last)
-              };
-          };
-          if (v1 instanceof ZoomIn) {
-              var minEndIndex = v.startIndex + 5.0 * Data_Maybe.fromMaybe(1000.0)(Data_Functor.map(Data_Maybe.functorMaybe)(Data_TimeSeries.resolution)(v.series));
-              var endIndex = v.startIndex + (v.endIndex - v.startIndex) / 2.0;
-              var $8 = {};
-              for (var $9 in v) {
-                  if ({}.hasOwnProperty.call(v, $9)) {
-                      $8[$9] = v[$9];
-                  };
-              };
-              $8.endIndex = Data_Ord.max(Data_Ord.ordNumber)(endIndex)(minEndIndex);
-              return $8;
-          };
-          if (v1 instanceof ZoomOut) {
-              var maxEndIndex = Data_Maybe.fromMaybe(v.startIndex)(Data_Functor.map(Data_Maybe.functorMaybe)(Data_TimeSeries.dpIndex)(Control_Bind.bind(Data_Maybe.bindMaybe)(v.series)(Data_TimeSeries.last)));
-              var endIndex = v.endIndex + (v.endIndex - v.startIndex);
-              var $11 = {};
-              for (var $12 in v) {
-                  if ({}.hasOwnProperty.call(v, $12)) {
-                      $11[$12] = v[$12];
-                  };
-              };
-              $11.endIndex = Data_Ord.min(Data_Ord.ordNumber)(endIndex)(maxEndIndex);
-              return $11;
-          };
-          throw new Error("Failed pattern match at Main line 45, column 1 - line 48, column 59: " + [ v.constructor.name, v1.constructor.name ]);
+  var NextFrame = (function () {
+      function NextFrame() {
+
       };
-  };
+      NextFrame.value = new NextFrame();
+      return NextFrame;
+  })();
+  var PrevFrame = (function () {
+      function PrevFrame() {
+
+      };
+      PrevFrame.value = new PrevFrame();
+      return PrevFrame;
+  })();
   var toChartData = function (xs) {
       return function (si) {
           return function (ei) {
@@ -1281,7 +1255,7 @@ var PS = {};
               return Views.showMetadata(v.series.value0)();
           };
       };
-      throw new Error("Failed pattern match at Main line 63, column 1 - line 64, column 1: " + [ v.constructor.name ]);
+      throw new Error("Failed pattern match at Main line 80, column 1 - line 81, column 1: " + [ v.constructor.name ]);
   };
   var main = Control_Monad_Eff_Console.log("App started");
   var initState = {
@@ -1289,9 +1263,81 @@ var PS = {};
       startIndex: 0.0, 
       endIndex: 0.0
   };
+  var indexVal = function (xs) {
+      return function (f) {
+          return Data_Maybe.fromMaybe(0.0)(Data_Functor.map(Data_Maybe.functorMaybe)(Data_TimeSeries.dpIndex)(Control_Bind.bind(Data_Maybe.bindMaybe)(xs)(f)));
+      };
+  };
+  var updateState = function (v) {
+      return function (v1) {
+          if (v1 instanceof SeriesLoaded) {
+              var xs = Data_Array.head(Data_TimeSeries_IO.fromCsv(v1.value0));
+              return {
+                  series: xs, 
+                  startIndex: indexVal(xs)(Data_TimeSeries.head), 
+                  endIndex: indexVal(xs)(Data_TimeSeries.last)
+              };
+          };
+          if (v1 instanceof ZoomIn) {
+              var minEndIndex = v.startIndex + 5.0 * Data_Maybe.fromMaybe(1000.0)(Data_Functor.map(Data_Maybe.functorMaybe)(Data_TimeSeries.resolution)(v.series));
+              var endIndex = v.startIndex + (v.endIndex - v.startIndex) / 2.0;
+              var $16 = {};
+              for (var $17 in v) {
+                  if ({}.hasOwnProperty.call(v, $17)) {
+                      $16[$17] = v[$17];
+                  };
+              };
+              $16.endIndex = Data_Ord.max(Data_Ord.ordNumber)(endIndex)(minEndIndex);
+              return $16;
+          };
+          if (v1 instanceof ZoomOut) {
+              var maxEndIndex = indexVal(v.series)(Data_TimeSeries.last);
+              var endIndex = v.endIndex + (v.endIndex - v.startIndex);
+              var $19 = {};
+              for (var $20 in v) {
+                  if ({}.hasOwnProperty.call(v, $20)) {
+                      $19[$20] = v[$20];
+                  };
+              };
+              $19.endIndex = Data_Ord.min(Data_Ord.ordNumber)(endIndex)(maxEndIndex);
+              return $19;
+          };
+          if (v1 instanceof NextFrame) {
+              var frame2 = indexVal(v.series)(Data_TimeSeries.last) - v.endIndex;
+              var frame1 = v.endIndex - v.startIndex;
+              var frame = Data_Ord.min(Data_Ord.ordNumber)(frame1)(frame2);
+              var $22 = {};
+              for (var $23 in v) {
+                  if ({}.hasOwnProperty.call(v, $23)) {
+                      $22[$23] = v[$23];
+                  };
+              };
+              $22.startIndex = v.startIndex + frame;
+              $22.endIndex = v.endIndex + frame;
+              return $22;
+          };
+          if (v1 instanceof PrevFrame) {
+              var frame2 = v.startIndex - indexVal(v.series)(Data_TimeSeries.head);
+              var frame1 = v.endIndex - v.startIndex;
+              var frame = Data_Ord.min(Data_Ord.ordNumber)(frame1)(frame2);
+              var $25 = {};
+              for (var $26 in v) {
+                  if ({}.hasOwnProperty.call(v, $26)) {
+                      $25[$26] = v[$26];
+                  };
+              };
+              $25.startIndex = v.startIndex - frame;
+              $25.endIndex = v.endIndex - frame;
+              return $25;
+          };
+          throw new Error("Failed pattern match at Main line 47, column 1 - line 49, column 33: " + [ v.constructor.name, v1.constructor.name ]);
+      };
+  };
   exports["SeriesLoaded"] = SeriesLoaded;
   exports["ZoomIn"] = ZoomIn;
   exports["ZoomOut"] = ZoomOut;
+  exports["NextFrame"] = NextFrame;
+  exports["PrevFrame"] = PrevFrame;
   exports["initState"] = initState;
   exports["main"] = main;
   exports["render"] = render;

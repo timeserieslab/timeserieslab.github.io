@@ -28,6 +28,8 @@ type State =
 data Event = SeriesLoaded String
            | ZoomIn
            | ZoomOut
+           | NextFrame
+           | PrevFrame
 
 
 main :: ∀ e. Eff (console :: CONSOLE, dom :: DOM | e) Unit
@@ -42,10 +44,9 @@ initState = { series: Nothing, startIndex: 0.0, endIndex: 0.0 }
 
 -- | Update state for query SeriesLoaded
 updateState :: State -> Event -> State
-updateState st (SeriesLoaded csv) = {series: xs, startIndex: indexVal TS.head, endIndex: indexVal TS.last}
+updateState st (SeriesLoaded csv) = {series: xs, startIndex: indexVal xs TS.head, endIndex: indexVal xs TS.last}
   where 
     xs = A.head (IO.fromCsv csv)
-    indexVal f = fromMaybe 0.0 $ TS.dpIndex <$> (xs >>= f)
 
 updateState state ZoomIn = state {endIndex = max endIndex minEndIndex}
   where 
@@ -55,7 +56,23 @@ updateState state ZoomIn = state {endIndex = max endIndex minEndIndex}
 updateState state ZoomOut = state {endIndex = min endIndex maxEndIndex}
   where 
     endIndex = state.endIndex + (state.endIndex - state.startIndex)
-    maxEndIndex = fromMaybe state.startIndex $ TS.dpIndex <$> (state.series >>= TS.last)
+    maxEndIndex = indexVal state.series TS.last
+
+updateState state NextFrame = state {startIndex = state.startIndex + frame, endIndex = state.endIndex + frame}
+  where
+    frame1 = state.endIndex - state.startIndex
+    frame2 = indexVal state.series TS.last - state.endIndex
+    frame = min frame1 frame2
+
+updateState state PrevFrame = state {startIndex = state.startIndex - frame, endIndex = state.endIndex - frame}
+  where
+    frame1 = state.endIndex - state.startIndex
+    frame2 = state.startIndex - indexVal state.series TS.head
+    frame = min frame1 frame2
+
+-- Helper function for getting index value
+indexVal :: ∀ a. Maybe (TS.Series a) -> (TS.Series a -> Maybe (TS.DataPoint a)) -> Number
+indexVal xs f = fromMaybe 0.0 $ TS.dpIndex <$> (xs >>= f)
 
 
 -- | Render state
