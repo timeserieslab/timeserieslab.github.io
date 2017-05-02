@@ -26,6 +26,8 @@ type State =
   }
 
 data Event = SeriesLoaded String
+           | ZoomIn
+           | ZoomOut
 
 
 main :: ∀ e. Eff (console :: CONSOLE, dom :: DOM | e) Unit
@@ -45,18 +47,32 @@ updateState st (SeriesLoaded csv) = {series: xs, startIndex: indexVal TS.head, e
     xs = A.head (IO.fromCsv csv)
     indexVal f = fromMaybe 0.0 $ TS.dpIndex <$> (xs >>= f)
 
+updateState state ZoomIn = state {endIndex = max endIndex minEndIndex}
+  where 
+    endIndex = state.startIndex + (state.endIndex - state.startIndex) / 2.0
+    minEndIndex = state.startIndex + 5.0 * (fromMaybe 1000.0 (TS.resolution <$> state.series))
+
+updateState state ZoomOut = state {endIndex = min endIndex maxEndIndex}
+  where 
+    endIndex = state.endIndex + (state.endIndex - state.startIndex)
+    maxEndIndex = fromMaybe state.startIndex $ TS.dpIndex <$> (state.series >>= TS.last)
+
 
 -- | Render state
 render :: forall e. State -> Eff (console :: CONSOLE, dom :: DOM | e) Unit
 render {series: Nothing} = log "No series loaded"
 render {series: Just xs, startIndex: si, endIndex: ei} = do 
-  plotSeries (toChartData 500 xs)
+  plotSeries (toChartData xs si ei)
   showRange si ei
   showMetadata xs
 
 
 -- | Take n samples from given series
-toChartData :: Int -> TS.Series Number -> Array ({date :: JSDate, value :: Number})
-toChartData n xs = map f $ A.take n (TS.toDataPoints xs)
+toChartData :: TS.Series Number 
+            -> Number       -- ^ Start index
+            -> Number       -- End index
+            -> Array ({date :: JSDate, value :: Number})
+toChartData xs si ei = map f $ TS.toDataPoints xs2
   where
+    xs2 = TS.slice si ei xs
     f dp = {date: mkDate (TS.dpIndex dp), value: TS.dpValue dp}

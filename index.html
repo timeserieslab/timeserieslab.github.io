@@ -32,7 +32,11 @@
 
   <div class="container">
     <div id="tsChart" width="100%" height="400px"></div>
-    <div>Show range from <strong id="showStart"></strong> to <strong id="showEnd"></strong></div>
+    <div>
+      Show range from <strong id="showStart"></strong> to <strong id="showEnd"></strong>
+      <button onClick="zoomIn()" class="btn btn-default">Zoom In</button>
+      <button onClick="zoomOut()" class="btn btn-default">Zoom Out</button>
+    </div>
   </div>
 
   <div class="container">
@@ -91,6 +95,16 @@
 
     function seriesLoaded(csv) {
         state = Main.updateState(state)(new Main.SeriesLoaded(csv));
+        Main.render(state)();      
+    }
+
+    function zoomIn() {
+        state = Main.updateState(state)(new Main.ZoomIn());
+        Main.render(state)();      
+    }
+
+    function zoomOut() {
+        state = Main.updateState(state)(new Main.ZoomOut());
         Main.render(state)();      
     }
 
