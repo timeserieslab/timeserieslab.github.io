@@ -51,7 +51,7 @@
     </table>
   </div>
 
-  <div id="seriesInfo" class="container">
+  <div class="container">
     <h2>Example Time Series</h2>
 
     <p>
@@ -60,6 +60,11 @@
       <button onClick="loadExample('test-24k.csv');" class="btn btn-default">Rainfall</button>
       <button onClick="loadExample('anomalies.csv');" class="btn btn-default">Anomalies 60K</button>
     </p>
+
+    <h2>Load from URL</h2>
+
+    <input type="text" size="100" id="urlText" placeholder="URL">
+    <button onClick="loadUrl()" class="btn btn-default">Load</button>
   </div>
   
   <hr/>
@@ -72,7 +77,16 @@
     var state = Main.initState;
 
     function loadExample(fname) {
-      jQuery.get('https://timeserieslab.github.io/testdata/'+fname, function (data) {
+      loadFromUrl('https://timeserieslab.github.io/testdata/'+fname);
+    }
+
+    function loadUrl() {
+      var url = document.getElementById('urlText').value;
+      loadFromUrl(url);
+    }
+
+    function loadFromUrl(url) {
+      jQuery.get(url, function (data) {
         seriesLoaded(data);
       });
     }
