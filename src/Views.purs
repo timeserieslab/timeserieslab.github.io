@@ -1,15 +1,19 @@
 module Views ( showMetadata
              , plotSeries
+             , showIndexHist
              , showRange
              ) where
 
 import Prelude
 import Control.Monad.Eff (Eff)
+import Control.Monad.Eff.Console (CONSOLE, log)
+import Data.Array as A
 import Data.Int (round)
 import Data.Maybe (fromMaybe)
 import DOM (DOM)
 
 import Data.TimeSeries as TS
+import Statistics.Sample as S
 
 import Helpers (JSDate, mkDate, toISO)
 
@@ -51,3 +55,11 @@ showRange :: ∀ e. Number -> Number -> Eff (dom :: DOM | e) Unit
 showRange x1 x2 = do
     setNodeText "showStart" $ toISO (mkDate x1)
     setNodeText "showEnd" $ toISO (mkDate x2)
+
+
+-- Show histogram of index values    
+showIndexHist :: ∀ a e. TS.Series a -> Eff (console :: CONSOLE, dom :: DOM | e) Unit
+showIndexHist xs = do
+    let idx1 = TS.index xs
+    let idx2 = A.zipWith (\x1 x2 -> x2-x1) idx1 (fromMaybe [] (A.tail idx1))
+    log $ "Index histogram " <> show (S.histogram idx2)

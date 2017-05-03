@@ -1116,19 +1116,24 @@ var PS = {};
   var $foreign = PS["Views"];
   var Control_Bind = PS["Control.Bind"];
   var Control_Monad_Eff = PS["Control.Monad.Eff"];
+  var Control_Monad_Eff_Console = PS["Control.Monad.Eff.Console"];
   var DOM = PS["DOM"];
+  var Data_Array = PS["Data.Array"];
   var Data_Boolean = PS["Data.Boolean"];
   var Data_EuclideanRing = PS["Data.EuclideanRing"];
   var Data_Function = PS["Data.Function"];
   var Data_Functor = PS["Data.Functor"];
   var Data_Int = PS["Data.Int"];
+  var Data_Map = PS["Data.Map"];
   var Data_Maybe = PS["Data.Maybe"];
   var Data_Ord = PS["Data.Ord"];
+  var Data_Ring = PS["Data.Ring"];
   var Data_Semigroup = PS["Data.Semigroup"];
   var Data_Show = PS["Data.Show"];
   var Data_TimeSeries = PS["Data.TimeSeries"];
   var Helpers = PS["Helpers"];
-  var Prelude = PS["Prelude"];        
+  var Prelude = PS["Prelude"];
+  var Statistics_Sample = PS["Statistics.Sample"];        
   var showRange = function (x1) {
       return function (x2) {
           return function __do() {
@@ -1153,7 +1158,7 @@ var PS = {};
       if (Data_Boolean.otherwise) {
           return Data_Show.show(Data_Show.showInt)(dt) + " milliseconds.";
       };
-      throw new Error("Failed pattern match at Views line 42, column 1 - line 50, column 1: " + [ dt.constructor.name ]);
+      throw new Error("Failed pattern match at Views line 46, column 1 - line 54, column 1: " + [ dt.constructor.name ]);
   };
   var formatTimeDelta = function (dt) {
       return formatTimeDelta$prime(Data_Int.round(dt));

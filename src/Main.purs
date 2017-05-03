@@ -16,7 +16,7 @@ import Data.TimeSeries as TS
 import Data.TimeSeries.IO as IO
 
 import Helpers (JSDate, mkDate)
-import Views (plotSeries, showMetadata, showRange)
+import Views (plotSeries, showMetadata, showIndexHist, showRange)
 
 
 type State = 
@@ -76,12 +76,13 @@ indexVal xs f = fromMaybe 0.0 $ TS.dpIndex <$> (xs >>= f)
 
 
 -- | Render state
-render :: forall e. State -> Eff (console :: CONSOLE, dom :: DOM | e) Unit
+render :: ∀ e. State -> Eff (console :: CONSOLE, dom :: DOM | e) Unit
 render {series: Nothing} = log "No series loaded"
 render {series: Just xs, startIndex: si, endIndex: ei} = do 
   plotSeries (toChartData xs si ei)
   showRange si ei
   showMetadata xs
+  -- showIndexHist xs
 
 
 -- | Take n samples from given series
@@ -93,3 +94,5 @@ toChartData xs si ei = map f $ TS.toDataPoints xs2
   where
     xs2 = TS.slice si ei xs
     f dp = {date: mkDate (TS.dpIndex dp), value: TS.dpValue dp}
+
+
