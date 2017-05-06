@@ -12,6 +12,7 @@ import Data.Array as A
 import Data.Maybe (Maybe(..), fromMaybe)
 import DOM (DOM)
 
+import LinearAlgebra.Vector (sum)
 import Data.TimeSeries as TS
 import Data.TimeSeries.IO as IO
 import Data.TimeSeries.Anomalies as TA
@@ -33,6 +34,7 @@ data Event = SeriesLoaded String
            | PrevFrame
            | Reindex
            | RemoveAnomalies
+           | GroupBy Number
 
 
 main :: ∀ e. Eff (console :: CONSOLE, dom :: DOM | e) Unit
@@ -82,6 +84,8 @@ updateState state RemoveAnomalies = state {series = Just ys}
     xs = fromMaybe TS.empty state.series
     model = TA.train(xs)
     ys = TA.removeOutliers model xs
+
+updateState state (GroupBy dt) = state {series = TS.groupBy dt sum <$> state.series}
 
 
 -- Helper function for getting index value
