@@ -152,6 +152,13 @@
         Main.render(state)();      
     }
 
+    function removeAnomalies() {
+        state = Main.updateState(state)(new Main.RemoveAnomalies());
+        Main.render(state)();      
+    }
+
+    
+
   </script> 
 
 </body>

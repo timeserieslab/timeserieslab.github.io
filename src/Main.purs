@@ -14,6 +14,7 @@ import DOM (DOM)
 
 import Data.TimeSeries as TS
 import Data.TimeSeries.IO as IO
+import Data.TimeSeries.Anomalies as TA
 
 import Helpers (JSDate, mkDate)
 import Views (plotSeries, showMetadata, showRange)
@@ -31,6 +32,7 @@ data Event = SeriesLoaded String
            | NextFrame
            | PrevFrame
            | Reindex
+           | RemoveAnomalies
 
 
 main :: ∀ e. Eff (console :: CONSOLE, dom :: DOM | e) Unit
@@ -74,6 +76,13 @@ updateState state PrevFrame = state {startIndex = state.startIndex - frame, endI
 updateState state Reindex = state {series = TS.reindex dt <$> state.series}
   where 
     dt = fromMaybe 1000.0 $ TS.resolution <$> state.series
+
+updateState state RemoveAnomalies = state {series = Just ys}
+  where 
+    xs = fromMaybe TS.empty state.series
+    model = TA.train(xs)
+    ys = TA.removeOutliers model xs
+
 
 -- Helper function for getting index value
 indexVal :: ∀ a. Maybe (TS.Series a) -> (TS.Series a -> Maybe (TS.DataPoint a)) -> Number
