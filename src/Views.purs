@@ -31,10 +31,12 @@ showMetadata xs = do
     let x1 = fromMaybe 0.0 $ TS.dpIndex <$> TS.head xs
     let x2 = fromMaybe 0.0 $ TS.dpIndex <$> TS.last xs
     let res = TS.resolution xs
+    let missing = (round ((x2-x1) / res)) - (TS.length xs) + 1
     setNodeText "startDate" $ toISO (mkDate x1)
     setNodeText "endDate" $ toISO (mkDate x2)
     setNodeText "pointNumber" $ show (TS.length xs)
     setNodeText "timeRes" $ formatTimeDelta res
+    setNodeText "missingPoints" $ show missing
 
 
 -- Convert time in millisecond into human readable format

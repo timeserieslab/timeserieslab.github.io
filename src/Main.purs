@@ -16,7 +16,7 @@ import Data.TimeSeries as TS
 import Data.TimeSeries.IO as IO
 
 import Helpers (JSDate, mkDate)
-import Views (plotSeries, showMetadata, showIndexHist, showRange)
+import Views (plotSeries, showMetadata, showRange)
 
 
 type State = 
@@ -30,6 +30,7 @@ data Event = SeriesLoaded String
            | ZoomOut
            | NextFrame
            | PrevFrame
+           | Reindex
 
 
 main :: ∀ e. Eff (console :: CONSOLE, dom :: DOM | e) Unit
@@ -69,6 +70,10 @@ updateState state PrevFrame = state {startIndex = state.startIndex - frame, endI
     frame1 = state.endIndex - state.startIndex
     frame2 = state.startIndex - indexVal state.series TS.head
     frame = min frame1 frame2
+
+updateState state Reindex = state {series = TS.reindex dt <$> state.series}
+  where 
+    dt = fromMaybe 1000.0 $ TS.resolution <$> state.series
 
 -- Helper function for getting index value
 indexVal :: ∀ a. Maybe (TS.Series a) -> (TS.Series a -> Maybe (TS.DataPoint a)) -> Number

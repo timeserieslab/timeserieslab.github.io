@@ -25,12 +25,7 @@
     </div>
   </nav>
 
-  <div class="container">
-     <div class="navbar-left navbar-text">Select CSV file</div>
-     <div><input type="file" id="fileInput" class="btn"></div>    
-  </div>
-
-  <div class="container">
+  <div id="time-series" class="container">
     <div id="tsChart" width="100%" height="400px"></div>
     <div>
       Show range from <strong id="showStart"></strong> to <strong id="showEnd"></strong>
@@ -39,19 +34,39 @@
       <button onClick="prevFrame()" class="btn btn-default">Previous</button>
       <button onClick="nextFrame()" class="btn btn-default">Next</button>
     </div>
-  </div>
 
-  <div class="container">
     <h2>Metadata</h2>
     <table class="table">
-      <tr><td>Number of points</td><td id="pointNumber"></td></tr>
-      <tr><td>Start date</td><td id="startDate"></td></tr>
-      <tr><td>End date</td><td id="endDate"></td></tr>
-      <tr><td>Time resolution</td><td id="timeRes"></td></tr>
+      <tr><td>Number of points</td><td id="pointNumber"></td><td></td></tr>
+      <tr><td>Start date</td><td id="startDate"></td><td></td></tr>
+      <tr><td>End date</td><td id="endDate"></td><td></td></tr>
+      <tr><td>Time resolution</td><td id="timeRes"></td><td></td></tr>
+      <tr>
+        <td>Missing points</td><td id="missingPoints"></td>
+        <td><button onClick="reindex()" class="btn btn-default">Reindex</button></td>
+      </tr>
+      <tr>
+        <td>Anomalies</td><td id="anomalies"></td>
+        <td><button onClick="removeAnomalies()" class="btn btn-default">Remove</button></td>
+      </tr>
     </table>
+    <hr/>
   </div>
 
   <div class="container">
+    <h2>Load CSV from disk</h2>
+    <div class="container">
+      <div class="navbar-left navbar-text">Select CSV file</div>
+      <div><input type="file" id="fileInput" class="btn"></div>    
+    </div>
+
+    <h2>Load from URL</h2>
+
+    <div>
+      <input type="text" size="100" id="urlText" placeholder="URL">
+      <button onClick="loadUrl()" class="btn btn-default">Load</button>
+    </div>
+
     <h2>Example Time Series</h2>
 
     <p>
@@ -62,13 +77,6 @@
     </p>
     <div>
       Also check <a href="https://github.com/numenta/NAB/tree/master/data">Numenta NAB</a> for some interesting datasets.
-    </div>
-
-    <h2>Load from URL</h2>
-
-    <div>
-      <input type="text" size="100" id="urlText" placeholder="URL">
-      <button onClick="loadUrl()" class="btn btn-default">Load</button>
     </div>
   </div>
   
@@ -136,6 +144,11 @@
 
     function nextFrame() {
         state = Main.updateState(state)(new Main.NextFrame());
+        Main.render(state)();      
+    }
+
+    function reindex() {
+        state = Main.updateState(state)(new Main.Reindex());
         Main.render(state)();      
     }
 
