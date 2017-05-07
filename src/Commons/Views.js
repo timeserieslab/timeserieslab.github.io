@@ -24,3 +24,15 @@ exports.setNodeText = function(id) {
     }
   }
 };
+
+
+exports.removeChildren = function(target) {
+  return function() {
+    var el = document.getElementById(target);
+
+    // http://stackoverflow.com/a/3955238/704831
+    while (el.firstChild) {
+      el.removeChild(el.firstChild);
+    }
+  };
+};
