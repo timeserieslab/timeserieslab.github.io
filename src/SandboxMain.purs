@@ -1,4 +1,4 @@
-module SandboxMain where
+module SandboxMain (main) where
 
 import Prelude
 import Control.Monad.Eff (Eff)
@@ -10,6 +10,8 @@ import Halogen.HTML.Properties as HP
 import Halogen.Aff as HA
 import Halogen.VDom.Driver (runUI)
 
+import Component.Navibar (renderNavibar)
+
 
 type State = Boolean
 
@@ -19,7 +21,7 @@ data Query a
 
 data Message = Toggled Boolean
 
-myButton :: forall m. H.Component HH.HTML Query Unit Message m
+myButton :: ∀ m. H.Component HH.HTML Query Unit Message m
 myButton =
   H.component
     { initialState: const initialState
@@ -27,33 +29,39 @@ myButton =
     , eval
     , receiver: const Nothing
     }
-  where
 
-  initialState :: State
-  initialState = false
+initialState :: State
+initialState = false
 
-  render :: State -> H.ComponentHTML Query
-  render state =
-    let
-      label = if state then "On" else "Off"
-    in
-      HH.button
-        [ HP.title label
-        , HE.onClick (HE.input_ Toggle)
-        ]
-        [ HH.text label ]
+render :: State -> H.ComponentHTML Query
+render state = do 
+  -- _ <- renderNavibar "Sandbox"
+  renderButton state
 
-  eval :: Query ~> H.ComponentDSL State Query Message m
-  eval = case _ of
-    Toggle next -> do
-      state <- H.get
-      let nextState = not state
-      H.put nextState
-      H.raise $ Toggled nextState
-      pure next
-    IsOn reply -> do
-      state <- H.get
-      pure (reply state)
+
+renderButton :: State -> H.ComponentHTML Query
+renderButton state =
+  let
+    label = if state then "On" else "Off"
+  in
+    HH.button
+      [ HP.title label
+      , HE.onClick (HE.input_ Toggle)
+      ]
+      [ HH.text label ]
+
+
+eval :: ∀ m. Query ~> H.ComponentDSL State Query Message m
+eval = case _ of
+  Toggle next -> do
+    state <- H.get
+    let nextState = not state
+    H.put nextState
+    H.raise $ Toggled nextState
+    pure next
+  IsOn reply -> do
+    state <- H.get
+    pure (reply state)
 
 
 main :: Eff (HA.HalogenEffects ()) Unit
