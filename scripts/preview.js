@@ -2648,3 +2648,4 @@ var PS = {};
   exports["render"] = render;
   exports["updateState"] = updateState;
 })(PS["PreviewMain"] = PS["PreviewMain"] || {});
+PS["PreviewMain"].main();
