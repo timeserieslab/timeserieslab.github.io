@@ -1,8 +1,8 @@
 {
   "private": true,
   "scripts": {
-    "build": "pulp build --to scripts/app.js",
-    "watch": "pulp -w build --to scripts/app.js"
+    "build-preview": "pulp build --skip-entry-point -m PreviewMain --to scripts/preview.js",
+    "watch-preview": "pulp -w build --skip-entry-point -m PreviewMain --to scripts/preview.js"
   },
   "devDependencies": {
     "pulp": "^10.0.1",

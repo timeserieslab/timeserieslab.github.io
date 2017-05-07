@@ -1,7 +1,8 @@
-module Helpers ( JSDate
-               , mkDate 
-               , toISO 
-               ) where
+module Commons.Helpers 
+    ( JSDate
+    , mkDate 
+    , toISO 
+    ) where
 
 
 data JSDate = JSDate 

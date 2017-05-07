@@ -1,8 +1,9 @@
-module Views ( showMetadata
-             , plotSeries
-             , showIndexHist
-             , showRange
-             ) where
+module Commons.Views 
+    ( showMetadata
+    , plotSeries
+    , showIndexHist
+    , showRange
+    ) where
 
 import Prelude
 import Control.Monad.Eff (Eff)
@@ -15,7 +16,7 @@ import DOM (DOM)
 import Data.TimeSeries as TS
 import Statistics.Sample as S
 
-import Helpers (JSDate, mkDate, toISO)
+import Commons.Helpers (JSDate, mkDate, toISO)
 
 
 type NodeId = String 

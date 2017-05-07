@@ -1,9 +1,10 @@
-module Main ( Event(..)
-            , initState
-            , main
-            , render
-            , updateState
-            ) where
+module PreviewMain 
+  ( Event(..)
+  , initState
+  , main
+  , render
+  , updateState
+  ) where
 
 import Prelude
 import Control.Monad.Eff (Eff)
@@ -16,8 +17,8 @@ import LinearAlgebra.Vector (sum)
 import Data.TimeSeries as TS
 import Data.TimeSeries.IO as IO
 
-import Helpers (JSDate, mkDate)
-import Views (plotSeries, showMetadata, showRange)
+import Commons.Helpers (JSDate, mkDate)
+import Commons.Views (plotSeries, showMetadata, showRange)
 
 
 type State = 
