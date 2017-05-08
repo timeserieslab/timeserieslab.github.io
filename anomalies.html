@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Time Series Lab</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+        crossorigin="anonymous">
+  <link href="assets/css/default.css" rel="stylesheet">
+  <link href="assets/metrics-graphics-2.11.0/metricsgraphics.css" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script src="assets/metrics-graphics-2.11.0/metricsgraphics.min.js"></script>
+  <script type="text/javascript" src="scripts/anomaly.js"></script>
+</head>
+<body>
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="index.html">Time Series Lab</a>
+        <p class="navbar-text">Anomaly filtering</p>
+      </div>
+        <button type="button" class="btn btn-primary navbar-btn" data-toggle="modal" data-target="#loadModal">
+          Load data
+        </button>
+    </div>
+  </nav>
+
+  <!-- Modal -->
+  <div class="modal fade" id="loadModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="myModalLabel">Load data</h4>
+        </div>
+        <div class="modal-body">
+          <h2>Load from disk</h2>
+          <div class="container">
+            <div class="navbar-left navbar-text">Select CSV file</div>
+            <div><input type="file" id="fileInput" class="btn"></div>    
+          </div>
+
+          <h2>Load from URL</h2>
+
+          <div>
+            <input type="text" size="50" id="urlText" placeholder="URL">
+            <button onClick="loadUrl()" class="btn btn-default" data-dismiss="modal">Load</button>
+          </div>
+
+          <h2>Example Time Series</h2>
+
+          <p>
+            <button onClick="loadExample('small.csv');" class="btn btn-default" data-dismiss="modal">
+              Small dataset
+            </button>
+            <button onClick="loadExample('turkey_elec.csv');" class="btn btn-default" data-dismiss="modal">
+              Electricity demand
+            </button>
+            <button onClick="loadExample('test-24k.csv');" class="btn btn-default" data-dismiss="modal">
+              Rainfall
+            </button>
+            <button onClick="loadExample('anomalies.csv');" class="btn btn-default" data-dismiss="modal">
+              Anomalies 60K
+            </button>
+          </p>
+          <div>
+            Also check <a href="https://github.com/numenta/NAB/tree/master/data" target="_blank">Numenta NAB</a> 
+            for some interesting datasets.
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="time-series" class="container">
+    <div id="tsChart" width="100%" height="400px"></div>
+    <div class="container">
+      Show range from <strong id="showStart"></strong> to <strong id="showEnd"></strong>
+      <button onClick="zoomIn()" class="btn btn-default">Zoom In</button>
+      <button onClick="zoomOut()" class="btn btn-default">Zoom Out</button>
+      <button onClick="prevFrame()" class="btn btn-default">Previous</button>
+      <button onClick="nextFrame()" class="btn btn-default">Next</button>
+    </div>
+    <div class="container">
+      Group by <input type="text" id="groupBy" placeholder="Seconds"/>
+      <button onClick="groupBy()" class="btn btn-default">Go</button>
+    </div>
+
+    <h2>Metadata</h2>
+    <table class="table">
+      <tr><td>Number of points</td><td id="pointNumber"></td></tr>
+      <tr><td>Start date</td><td id="startDate"></td></tr>
+      <tr><td>End date</td><td id="endDate"></td></tr>
+      <tr><td>Time resolution</td><td id="timeRes"></td></tr>
+      <tr><td>Missing points</td><td id="missingPoints"></td></tr>    
+    </table>
+    <hr/>
+  </div>
+
+  <hr/>
+  <footer style="text-align: center;">
+    <a href="https://github.com/timeserieslab/timeserieslab.github.io">Github</a>
+  </footer>
+
+  <script type="text/javascript">
+    var Main = PS['AnomalyMain'];
+    var state = Main.initState;
+
+    function loadExample(fname) {
+      loadFromUrl('https://timeserieslab.github.io/testdata/'+fname);
+    }
+
+    function loadUrl() {
+      var url = document.getElementById('urlText').value;
+      loadFromUrl(url);
+    }
+
+    function loadFromUrl(url) {
+      jQuery.get(url, function (data) {
+        seriesLoaded(data);
+      });
+    }
+
+    // Connect load from disk
+    window.onload = function() {
+      var fileInput = document.getElementById('fileInput');
+      fileInput.addEventListener('change', function(e) {
+          var file = fileInput.files[0];
+          var textType = /text.*/;
+          if (file.type.match(textType)) {
+              var reader = new FileReader();
+              reader.onload = function(e) {
+                seriesLoaded(reader.result);
+              }
+              reader.readAsText(file);
+          } else {
+              console.log("File not supported!");
+          }
+          $('#loadModal').modal('toggle');
+      });
+    }
+
+    function seriesLoaded(csv) {
+        state = Main.updateState(state)(new Main.SeriesLoaded(csv));
+        Main.render(state)();      
+    }
+
+    function zoomIn() {
+        state = Main.updateState(state)(new Main.ZoomIn());
+        Main.render(state)();      
+    }
+
+    function zoomOut() {
+        state = Main.updateState(state)(new Main.ZoomOut());
+        Main.render(state)();      
+    }
+
+    function prevFrame() {
+        state = Main.updateState(state)(new Main.PrevFrame());
+        Main.render(state)();      
+    }
+
+    function nextFrame() {
+        state = Main.updateState(state)(new Main.NextFrame());
+        Main.render(state)();      
+    }
+
+    function groupBy() {
+        var dt = document.getElementById('groupBy').value;
+        state = Main.updateState(state)(new Main.GroupBy(dt*1000));
+        Main.render(state)();      
+    } 
+
+  </script> 
+
+</body>
+</html>

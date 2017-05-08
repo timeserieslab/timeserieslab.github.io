@@ -3,6 +3,8 @@
   "scripts": {
     "build-preview": "pulp build -m PreviewMain --to scripts/preview.js",
     "watch-preview": "pulp -w build -m PreviewMain --to scripts/preview.js",
+    "build-anomaly": "pulp build -m AnomalyMain --to scripts/anomaly.js",
+    "watch-anomaly": "pulp -w build -m AnomalyMain --to scripts/anomaly.js",
     "build-sandbox": "pulp build -m SandboxMain --to scripts/sandbox.js",
     "watch-sandbox": "pulp -w build -m SandboxMain --to scripts/sandbox.js"
   },
