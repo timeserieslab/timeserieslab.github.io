@@ -10,14 +10,18 @@ https://timeserieslab.github.io/
 ## Build
 
 ```bash
-npm run build
+npm run build-preview
+npm run watch-preview
 ```
 
 This is an alias to:
 
 ```bash
-pulp build --to scripts/app.js
+pulp build --to scripts/preview.js
 ```
+
+Each page has its own build command.
+
 
 # Join in!
 
