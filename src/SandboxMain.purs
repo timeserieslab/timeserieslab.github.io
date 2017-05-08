@@ -34,12 +34,14 @@ initialState :: State
 initialState = false
 
 render :: State -> H.ComponentHTML Query
-render state = do 
-  -- _ <- renderNavibar "Sandbox"
-  renderButton state
+render state = 
+  HH.div_ 
+    [ renderNavibar "Sandbox"
+    , renderButton state
+    ]
 
 
-renderButton :: State -> H.ComponentHTML Query
+renderButton :: ∀ p. State -> HH.HTML p (Query Unit)
 renderButton state =
   let
     label = if state then "On" else "Off"
