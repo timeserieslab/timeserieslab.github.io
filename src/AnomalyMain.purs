@@ -13,13 +13,12 @@ import Data.Array as A
 import Data.Maybe (Maybe(..), fromMaybe)
 import DOM (DOM)
 
-import LinearAlgebra.Vector (sum)
 import Data.TimeSeries as TS
 import Data.TimeSeries.IO as IO
 import Data.TimeSeries.Anomalies as TA
 
 import Commons.Helpers (JSDate, mkDate)
-import Commons.Views (plotSeries, showMetadata, showRange)
+import Commons.Views (plotSeries, showAnomalies, showMetadata, showRange)
 
 
 type State = 
@@ -93,7 +92,7 @@ render {series: Just xs, startIndex: si, endIndex: ei} = do
   plotSeries (toChartData xs si ei)
   showRange si ei
   showMetadata xs
-  -- showIndexHist xs
+  showAnomalies xs
 
 
 -- | Take n samples from given series

@@ -1,6 +1,7 @@
 module Commons.Views 
     ( showMetadata
     , plotSeries
+    , showAnomalies
     , showIndexHist
     , showRange
     ) where
@@ -13,8 +14,10 @@ import Data.Int (round)
 import Data.Maybe (fromMaybe)
 import DOM (DOM)
 
+import LinearAlgebra.Matrix as M
 import Data.TimeSeries as TS
 import Statistics.Sample as S
+import Learn.Unsupervised.OutlierDetection as OD
 
 import Commons.Helpers (JSDate, mkDate, toISO)
 
@@ -66,3 +69,13 @@ showIndexHist xs = do
     let idx1 = TS.index xs
     let idx2 = A.zipWith (\x1 x2 -> x2-x1) idx1 (fromMaybe [] (A.tail idx1))
     log $ "Index histogram " <> show (S.histogram idx2)
+
+
+-- Show anomaly count
+showAnomalies :: ∀ e. TS.Series Number -> Eff (console :: CONSOLE, dom :: DOM | e) Unit
+showAnomalies xs = do
+    let td = fromMaybe (M.zeros 1 1) $ M.fromArray (TS.length xs) 1 (TS.values xs)
+    let model = OD.train td
+    let predictions = OD.predict model td
+    let s4 = map (\p -> p < 0.05) predictions
+    setNodeText "anomalies" $ show (A.length (A.filter id s4))
