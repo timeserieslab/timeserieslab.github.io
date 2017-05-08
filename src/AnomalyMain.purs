@@ -15,7 +15,7 @@ import DOM (DOM)
 
 import Data.TimeSeries as TS
 import Data.TimeSeries.IO as IO
-import Data.TimeSeries.Anomalies as TA
+import Data.TimeSeries.Anomaly as TA
 
 import Commons.Helpers (JSDate, mkDate)
 import Commons.Views (plotSeries, showAnomalies, showMetadata, showRange)
