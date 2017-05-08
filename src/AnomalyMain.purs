@@ -16,6 +16,7 @@ import DOM (DOM)
 import LinearAlgebra.Vector (sum)
 import Data.TimeSeries as TS
 import Data.TimeSeries.IO as IO
+import Data.TimeSeries.Anomalies as TA
 
 import Commons.Helpers (JSDate, mkDate)
 import Commons.Views (plotSeries, showMetadata, showRange)
@@ -32,7 +33,7 @@ data Event = SeriesLoaded String
            | ZoomOut
            | NextFrame
            | PrevFrame
-           | GroupBy Number
+           | RemoveAnomalies
 
 
 main :: ∀ e. Eff (console :: CONSOLE, dom :: DOM | e) Unit
@@ -73,7 +74,11 @@ updateState state PrevFrame = state {startIndex = state.startIndex - frame, endI
     frame2 = state.startIndex - indexVal state.series TS.head
     frame = min frame1 frame2
 
-updateState state (GroupBy dt) = state {series = TS.groupBy dt sum <$> state.series}
+updateState state RemoveAnomalies = state {series = Just ys}
+  where 
+    xs = fromMaybe TS.empty state.series
+    model = TA.train(xs)
+    ys = TA.removeOutliers model xs
 
 
 -- Helper function for getting index value

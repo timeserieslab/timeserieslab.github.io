@@ -88,18 +88,18 @@
       <button onClick="prevFrame()" class="btn btn-default">Previous</button>
       <button onClick="nextFrame()" class="btn btn-default">Next</button>
     </div>
-    <div class="container">
-      Group by <input type="text" id="groupBy" placeholder="Seconds"/>
-      <button onClick="groupBy()" class="btn btn-default">Go</button>
-    </div>
+    
 
     <h2>Metadata</h2>
     <table class="table">
-      <tr><td>Number of points</td><td id="pointNumber"></td></tr>
-      <tr><td>Start date</td><td id="startDate"></td></tr>
-      <tr><td>End date</td><td id="endDate"></td></tr>
-      <tr><td>Time resolution</td><td id="timeRes"></td></tr>
-      <tr><td>Missing points</td><td id="missingPoints"></td></tr>    
+      <tr><td>Number of points</td><td id="pointNumber"></td><td></td></tr>
+      <tr><td>Start date</td><td id="startDate"></td><td></td></tr>
+      <tr><td>End date</td><td id="endDate"></td><td></td></tr>
+      <tr><td>Time resolution</td><td id="timeRes"></td><td></td></tr>   
+      <tr>
+        <td>Anomalies</td><td id="anomalies"></td>
+        <td><button onClick="removeAnomalies()" class="btn btn-default">Remove</button></td>
+      </tr>
     </table>
     <hr/>
   </div>
@@ -171,6 +171,11 @@
         state = Main.updateState(state)(new Main.NextFrame());
         Main.render(state)();      
     }
+
+    function removeAnomalies() {
+        state = Main.updateState(state)(new Main.RemoveAnomalies());
+        Main.render(state)();      
+    }    
 
     function groupBy() {
         var dt = document.getElementById('groupBy').value;
