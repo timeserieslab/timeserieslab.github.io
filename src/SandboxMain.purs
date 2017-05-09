@@ -10,7 +10,7 @@ import Halogen.HTML.Properties as HP
 import Halogen.Aff as HA
 import Halogen.VDom.Driver (runUI)
 
-import Component.Navibar (renderNavibar)
+import Component.Navibar (renderNavibar, renderLoadModal)
 
 
 type State = Boolean
@@ -37,6 +37,7 @@ render :: State -> H.ComponentHTML Query
 render state = 
   HH.div_ 
     [ renderNavibar "Sandbox"
+    , renderLoadModal
     , renderButton state
     ]
 
