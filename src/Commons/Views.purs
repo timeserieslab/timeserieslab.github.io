@@ -11,13 +11,11 @@ import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE, log)
 import Data.Array as A
 import Data.Int (round)
-import Data.Maybe (fromMaybe)
+import Data.Maybe (Maybe(..), fromMaybe)
 import DOM (DOM)
 
-import LinearAlgebra.Matrix as M
 import Data.TimeSeries as TS
 import Statistics.Sample as S
-import Learn.Unsupervised.OutlierDetection as OD
 
 import Commons.Helpers (JSDate, mkDate, toISO)
 
@@ -72,10 +70,6 @@ showIndexHist xs = do
 
 
 -- Show anomaly count
-showAnomalies :: ∀ e. TS.Series Number -> Eff (console :: CONSOLE, dom :: DOM | e) Unit
-showAnomalies xs = do
-    let td = fromMaybe (M.zeros 1 1) $ M.fromArray (TS.length xs) 1 (TS.values xs)
-    let model = OD.train td
-    let predictions = OD.predict model td
-    let s4 = map (\p -> p < 0.05) predictions
-    setNodeText "anomalies" $ show (A.length (A.filter id s4))
+showAnomalies :: ∀ e. Maybe Int -> Eff (console :: CONSOLE, dom :: DOM | e) Unit
+showAnomalies Nothing = setNodeText "anomalies" ""
+showAnomalies (Just n) = setNodeText "anomalies" $ show n

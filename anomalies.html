@@ -98,7 +98,10 @@
       <tr><td>Time resolution</td><td id="timeRes"></td><td></td></tr>   
       <tr>
         <td>Anomalies</td><td id="anomalies"></td>
-        <td><button onClick="removeAnomalies()" class="btn btn-default">Remove</button></td>
+        <td>
+          <button onClick="findAnomalies()" class="btn btn-default">Find</button>
+          <button onClick="removeAnomalies()" class="btn btn-default">Remove</button>
+        </td>
       </tr>
     </table>
     <hr/>
@@ -171,6 +174,11 @@
         state = Main.updateState(state)(new Main.NextFrame());
         Main.render(state)();      
     }
+
+    function findAnomalies() {
+        state = Main.updateState(state)(new Main.FindAnomalies());
+        Main.render(state)();      
+    }    
 
     function removeAnomalies() {
         state = Main.updateState(state)(new Main.RemoveAnomalies());

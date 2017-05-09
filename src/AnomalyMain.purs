@@ -13,9 +13,11 @@ import Data.Array as A
 import Data.Maybe (Maybe(..), fromMaybe)
 import DOM (DOM)
 
+import LinearAlgebra.Matrix as M
 import Data.TimeSeries as TS
 import Data.TimeSeries.IO as IO
 import Data.TimeSeries.Anomaly as TA
+import Learn.Unsupervised.OutlierDetection as OD
 
 import Commons.Helpers (JSDate, mkDate)
 import Commons.Views (plotSeries, showAnomalies, showMetadata, showRange)
@@ -25,6 +27,7 @@ type State =
   { series :: Maybe (TS.Series Number)  -- ^ Loaded Time series
   , startIndex :: Number                -- ^ Show series starting from this index
   , endIndex :: Number                  -- ^ Show up to this index
+  , anomalyCount :: Maybe Int           -- ^ Number of anomalies in time series
   }
 
 data Event = SeriesLoaded String
@@ -32,6 +35,7 @@ data Event = SeriesLoaded String
            | ZoomOut
            | NextFrame
            | PrevFrame
+           | FindAnomalies
            | RemoveAnomalies
 
 
@@ -42,14 +46,15 @@ main = do
 
 -- Initial state
 initState :: State 
-initState = { series: Nothing, startIndex: 0.0, endIndex: 0.0 }
+initState = { series: Nothing, startIndex: 0.0, endIndex: 0.0, anomalyCount: Nothing }
 
 
 -- | Update state for query SeriesLoaded
 updateState :: State -> Event -> State
-updateState st (SeriesLoaded csv) = {series: xs, startIndex: indexVal xs TS.head, endIndex: indexVal xs TS.last}
-  where 
-    xs = A.head (IO.fromCsv csv)
+updateState state (SeriesLoaded csv) = 
+  state {series = xs, startIndex = indexVal xs TS.head, endIndex = indexVal xs TS.last}
+    where 
+      xs = A.head (IO.fromCsv csv)
 
 updateState state ZoomIn = state {endIndex = max endIndex minEndIndex}
   where 
@@ -73,11 +78,13 @@ updateState state PrevFrame = state {startIndex = state.startIndex - frame, endI
     frame2 = state.startIndex - indexVal state.series TS.head
     frame = min frame1 frame2
 
-updateState state RemoveAnomalies = state {series = Just ys}
+updateState state FindAnomalies = state {anomalyCount = countAnomalies <$> state.series}
+
+updateState state RemoveAnomalies = state {series = Just ys, anomalyCount = Nothing}
   where 
     xs = fromMaybe TS.empty state.series
     model = TA.train(xs)
-    ys = TA.removeOutliers model xs
+    ys = TA.removeOutliers model xs    
 
 
 -- Helper function for getting index value
@@ -88,11 +95,11 @@ indexVal xs f = fromMaybe 0.0 $ TS.dpIndex <$> (xs >>= f)
 -- | Render state
 render :: ∀ e. State -> Eff (console :: CONSOLE, dom :: DOM | e) Unit
 render {series: Nothing} = log "No series loaded"
-render {series: Just xs, startIndex: si, endIndex: ei} = do 
+render {series: Just xs, startIndex: si, endIndex: ei, anomalyCount: ac} = do 
   plotSeries (toChartData xs si ei)
   showRange si ei
   showMetadata xs
-  showAnomalies xs
+  showAnomalies ac
 
 
 -- | Take n samples from given series
@@ -106,3 +113,10 @@ toChartData xs si ei = map f $ TS.toDataPoints xs2
     f dp = {date: mkDate (TS.dpIndex dp), value: TS.dpValue dp}
 
 
+-- Count anomalies
+countAnomalies :: TS.Series Number -> Int
+countAnomalies xs = A.length (A.filter (_ < 0.01) ys)
+  where
+    td = fromMaybe (M.zeros 1 1) $ M.fromArray (TS.length xs) 1 (TS.values xs)
+    model = OD.train td
+    ys = OD.predict model td
