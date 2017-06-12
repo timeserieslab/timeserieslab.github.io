@@ -134,7 +134,8 @@
       fileInput.addEventListener('change', function(e) {
           var file = fileInput.files[0];
           var textType = /text.*/;
-          if (file.type.match(textType)) {
+          var windowsMimeHack = 'application/vnd.ms-excel';
+          if (file.type.match(textType) || file.type.match(windowsMimeHack)) {
               var reader = new FileReader();
               reader.onload = function(e) {
                 seriesLoaded(reader.result);
